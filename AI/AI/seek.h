@@ -20,7 +20,29 @@ public:
 	{
 		endPosition = _endPosition;
 		vec2 desiredRoute = endPosition - position;
-		vec2 force = desiredRoute + vectorMove;
+
+		// limit desiredRoute
+		if (!(desiredRoute.x == 0 && desiredRoute.y == 0))
+		{
+			if (glm::length(desiredRoute) > maxSpeed)
+			{
+				desiredRoute = normalize(desiredRoute)*maxSpeed;
+			}
+			vec2 force = desiredRoute - vectorMove;
+
+			// limit force
+			if (!(force.x == 0 && force.y == 0))
+			{
+				if (glm::length(force) > maxSpeed)
+				{
+					force = normalize(force)*maxSpeed;
+				}
+
+				//a =a+f
+				//v = u+a
+				//pos = pos + v *delta
+			}						
+		}
 	}
 
 	vec2 endPosition;
