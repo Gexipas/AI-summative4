@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="seek.h">
@@ -38,5 +41,28 @@
     <ClInclude Include="Q.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="boid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="boidMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\shaders\fragmentshader.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="resources\shaders\vertexshader.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

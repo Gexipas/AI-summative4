@@ -143,14 +143,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShaderLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="boid.h" />
+    <ClInclude Include="boidMesh.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="CPF.h" />
     <ClInclude Include="flocking.h" />
     <ClInclude Include="LF.h" />
     <ClInclude Include="pathFollow.h" />
     <ClInclude Include="Q.h" />
     <ClInclude Include="seek.h" />
+    <ClInclude Include="ShaderLoader.h" />
+    <ClInclude Include="utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\shaders\fragmentshader.txt" />
+    <Text Include="resources\shaders\vertexshader.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

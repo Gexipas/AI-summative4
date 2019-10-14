@@ -5,6 +5,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "boid.h"
+
 using namespace glm;
 
 class seek
@@ -16,7 +18,7 @@ public:
 	}
 	~seek(){}
 
-	void update(float deltatime, vec2 _endPosition)
+	void update(float _deltatime, vec2 _endPosition)
 	{
 		endPosition = _endPosition;
 		vec2 desiredRoute = endPosition - position;
