@@ -34,6 +34,8 @@ public:
 	std::vector<vec2> m_velocityBoids;
 	std::vector<vec2> m_positionBoids;
 	std::vector<vec3> m_colorBoids;
+	vec2 playerVelocityBoid;
+	vec2 playerPositionBoid;
 	float m_maxSpeed = 100.0f;
 	float m_maxforce = 1.0f;
 
@@ -64,7 +66,7 @@ public:
 			glUniform3f(glGetUniformLocation(program, "colorBoid"),color.x, color.y, color.z);
 
 			float angle = -0.785398f + atan2(m_velocityBoids[i].y, m_velocityBoids[i].x);
-			glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(m_positionBoids[i], -100.0f +(float)i));
+			glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(m_positionBoids[i], -200.0f +(float)i));
 			glm::mat4 rotationZ = glm::rotate(glm::mat4(), angle, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 model = translationMatrix * rotationZ;
 			glm::mat4 pvm = pv * model;
@@ -83,13 +85,27 @@ public:
 
 	void newBoid()
 	{
-		m_velocityBoids.push_back({ 1.0f,0.0f });
-		m_positionBoids.push_back(m_mousePosition);
-		float R = (float)(rand() % 10001) / 10000;
-		float G = (float)(rand() % 10001) / 10000;
-		float B = (float)(rand() % 10001) / 10000;
-		m_colorBoids.push_back({ R,G,B });
+		if (m_velocityBoids.size() < 200)
+		{
+			m_velocityBoids.push_back({ 1.0f,0.0f });
+			m_positionBoids.push_back(m_mousePosition);
+			float R = (float)(rand() % 10001) / 10000;
+			float G = (float)(rand() % 10001) / 10000;
+			float B = (float)(rand() % 10001) / 10000;
+			m_colorBoids.push_back({ R,G,B });
+		}
 	}
+
+	void deleteBoid()
+	{
+		if (m_velocityBoids.size() > 0)
+		{
+			m_velocityBoids.pop_back();
+			m_mousePosition.pop_pack();
+			m_colorBoids.pop_back();
+		}		
+	}
+
 
 private:
 	// variables	
@@ -143,6 +159,82 @@ private:
 
 		//pos = pos + v *delta
 		m_positionBoids[boid] = position + (newVelocity * _deltatime);
+		if (m_positionBoids[boid].x > (float)SCR_WIDTH / 2) // right edge screen collision
+		{
+			m_positionBoids[boid].x = -((float)SCR_WIDTH / 2) + 1.0f;
+		}
+		if (m_positionBoids[boid].x < -(float)SCR_WIDTH / 2) // left edge screen collision
+		{
+			m_positionBoids[boid].x = ((float)SCR_WIDTH / 2) - 1.0f;
+		}
+		if (m_positionBoids[boid].y > (float)SCR_HEIGHT / 2) // top edge screen collision
+		{
+			m_positionBoids[boid].y = -((float)SCR_HEIGHT / 2) + 1.0f;
+		}
+		if (m_positionBoids[boid].y < -(float)SCR_HEIGHT / 2) // bottom edge screen collision
+		{
+			m_positionBoids[boid].y = ((float)SCR_HEIGHT / 2) - 1.0f;
+		}
+	}
+
+	// arrive function
+	void arrive(int boid, float _deltatime, vec2 _endPosition)
+	{
+		vec2 position = m_positionBoids[boid];
+		vec2 velocity = m_velocityBoids[boid];
+		vec2 accel;
+		vec2 desiredRoute = _endPosition - position;
+
+		// limit desiredRoute
+		if (glm::length(desiredRoute) < 100.0f)// slow for arrival
+		{
+			desiredRoute = normalize(desiredRoute)*m_maxSpeed*(glm::length(desiredRoute)/100);
+		}
+		else
+		{
+			desiredRoute = normalize(desiredRoute)*m_maxSpeed;
+		}
+		
+		vec2 force = desiredRoute - velocity;
+
+		// limit force
+		if (glm::length(force) > m_maxforce)
+		{
+			force = normalize(force)*m_maxforce;
+		}
+
+		//a = a+f
+		accel = accel + force;
+
+		//v = u+a
+		vec2 newVelocity = velocity + accel;
+		if (!(newVelocity.x == 0 && newVelocity.y == 0)) // cap speed
+		{
+			if (glm::length(newVelocity) > m_maxSpeed)
+			{
+				newVelocity = normalize(newVelocity)*m_maxSpeed;
+			}
+		}
+		m_velocityBoids[boid] = newVelocity;
+
+		//pos = pos + v *delta
+		m_positionBoids[boid] = position + (newVelocity * _deltatime);
+		if (m_positionBoids[boid].x > (float)SCR_WIDTH / 2) // right edge screen collision
+		{
+			m_positionBoids[boid].x = -((float)SCR_WIDTH / 2) + 1.0f;
+		}
+		if (m_positionBoids[boid].x < -(float)SCR_WIDTH / 2) // left edge screen collision
+		{
+			m_positionBoids[boid].x = ((float)SCR_WIDTH / 2) - 1.0f;
+		}
+		if (m_positionBoids[boid].y > (float)SCR_HEIGHT / 2) // top edge screen collision
+		{
+			m_positionBoids[boid].y = -((float)SCR_HEIGHT / 2) + 1.0f;
+		}
+		if (m_positionBoids[boid].y < -(float)SCR_HEIGHT / 2) // bottom edge screen collision
+		{
+			m_positionBoids[boid].y = ((float)SCR_HEIGHT / 2) - 1.0f;
+		}
 	}
 
 	// setup 2d mesh
