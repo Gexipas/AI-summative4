@@ -14,13 +14,22 @@
 
 #include "ShaderLoader.h"
 #include "camera.h"
-#include "GameManager.h"
+#include "boid.h"
 
 #include "utils.h"
 
 using namespace std;
 
-GLuint programAnim;
+enum InputState
+{
+	INPUT_UP,
+	INPUT_DOWN,
+	INPUT_UP_FIRST,
+	INPUT_DOWN_FIRST
+};
+
+InputState MouseState[3];
+
 GLuint program;
 
 float deltaTime;
@@ -29,6 +38,8 @@ float previousTimeStamp;
 void Render();
 void Init(int argc, char **argv);
 void Update();
+void mousePassiveInput(int x, int y);
+void MouseClick(int button, int state, int x, int y);
 
 GLuint VBO, VAO, EBO, texture;
 
@@ -42,8 +53,7 @@ int main(int argc, char **argv)
 void Render()
 {
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-	gameManager::instance().Draw();
+	boid::instance().render(program);
 	glutSwapBuffers();
 }
 
@@ -67,11 +77,8 @@ void Init(int argc, char **argv)
 	// Colour
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
-	program = ShaderLoader::CreateProgram("resources/shaders/vertexshader2D.txt", "resources/shaders/fragmentshader2D.txt");
-	/*
-	programAnim = ShaderLoader::CreateProgram("resources/shaders/vertexshaderAnim.txt",
-		"resources/shaders/fragmentshaderAnim.txt");*/
-
+	program = ShaderLoader::CreateProgram("resources/shaders/vertexshader.txt", "resources/shaders/fragmentshader.txt");
+	
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
@@ -82,12 +89,9 @@ void Init(int argc, char **argv)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Callbacks
-	glutKeyboardFunc(inputGlut::instance().KeyboardDown);
-	glutKeyboardUpFunc(inputGlut::instance().KeyboardUp);
-	glutSpecialFunc(inputGlut::instance().specialKeyboardDown);
-	glutSpecialUpFunc(inputGlut::instance().specialKeyboardUp);
-	glutPassiveMotionFunc(inputGlut::instance().mousePassiveInput);
-	glutMotionFunc(inputGlut::instance().MouseClick);
+	
+	glutPassiveMotionFunc(mousePassiveInput);
+	glutMouseFunc(MouseClick);
 	glutDisplayFunc(Render);
 	glutIdleFunc(Update);
 
@@ -103,8 +107,29 @@ void Update()
 	deltaTime = (currentTime - previousTimeStamp) * 0.001f;
 	previousTimeStamp = currentTime;
 
-	gameManager::instance().Update(deltaTime);
+	boid::instance().update(deltaTime);
+
+	if (MouseState[0] == INPUT_DOWN_FIRST)
+	{
+		boid::instance().newBoid();
+		MouseState[0] = INPUT_DOWN;
+	}
 
 	glutPostRedisplay();
 }
 
+ void mousePassiveInput(int x, int y)
+{
+	 boid::instance().m_mousePosition.x = x - (float)SCR_WIDTH/2;
+	 boid::instance().m_mousePosition.y = -y + (float)SCR_HEIGHT/2;
+}
+
+void MouseClick(int button, int state, int x, int y)
+{
+	boid::instance().m_mousePosition.x = x - (float)SCR_WIDTH / 2;
+	boid::instance().m_mousePosition.y = -y + (float)SCR_HEIGHT / 2;
+	if (button >= 3)
+		return;
+
+	MouseState[button] = (state == GLUT_DOWN) ? INPUT_DOWN_FIRST : INPUT_UP_FIRST;
+}
