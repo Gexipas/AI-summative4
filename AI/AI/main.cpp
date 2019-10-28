@@ -91,6 +91,7 @@ void Init(int argc, char **argv)
 	// Callbacks
 	
 	glutPassiveMotionFunc(mousePassiveInput);
+	glutMotionFunc(mousePassiveInput);
 	glutMouseFunc(MouseClick);
 	glutDisplayFunc(Render);
 	glutIdleFunc(Update);
@@ -112,7 +113,12 @@ void Update()
 	if (MouseState[0] == INPUT_DOWN_FIRST)
 	{
 		boid::instance().newBoid();
-		MouseState[0] = INPUT_DOWN;
+		//MouseState[0] = INPUT_DOWN;
+	}
+	if (MouseState[2] == INPUT_DOWN_FIRST)
+	{
+		boid::instance().deleteBoid();
+		//MouseState[2] = INPUT_DOWN;
 	}
 
 	glutPostRedisplay();

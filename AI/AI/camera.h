@@ -68,7 +68,7 @@ public:
 		float halfScreenHeight = (float)SCR_HEIGHT * 0.5f;
 
 		// ortho center
-		glm::mat4 proj = glm::ortho(-halfScreenWidth, halfScreenWidth, -halfScreenHeight, halfScreenHeight, 0.01f, 1000.0f);
+		glm::mat4 proj = glm::ortho(-halfScreenWidth, halfScreenWidth, -halfScreenHeight, halfScreenHeight, 0.01f, 5000.0f);
 
 		// ortho top left
 		//glm::mat4 proj = glm::ortho(0.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, 0.1f, 100.0f);
