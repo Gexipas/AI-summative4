@@ -42,6 +42,7 @@ public:
 	float wanderRadius = 60.0f;
 	float maxBoidNumber = 5000.0f;
 	bool m_bContain = false;
+	int m_iMode = 0;
 
 	static boid& instance()
 	{
@@ -53,7 +54,8 @@ public:
 	void render(GLuint program);
 	
 	void newBoid();// create Boid	
-	void deleteBoid();// delete Boid
+	void deleteBoid(bool _bDelAll);// delete Boid
+	void togglePlayerBoid(bool _bOn);// toggle player boid
 
 private:
 	// variables	
@@ -70,19 +72,22 @@ private:
 		srand((unsigned int)time(NULL));
 	}
 
+	//added behaviours
+	void arriveControlled(float _deltatime);// player controlled boid
+
 	//simple behaviours
 	void seek(int boid, float _deltatime, vec2 _endPosition);// seek function
 	vec2 flee(int _boid);// flee function
+	vec2 pursuit(int _boid);// pursuit function
+	vec2 evade(int _boid);// evade function
 	void arrive(int boid, float _deltatime, vec2 _endPosition);// arrive function
 	vec2 wandering(int _boid);// wander function
 	void containment(int boid, bool bContain);// containment function
+	vec2 pathFollowing(int _boid);// path following
 
 	// advanced behaviours
 	vec2 flocking(int _boid);// flocking function
-
 	
-	
-
 	// texture
 	void setup2DMesh();// setup 2d mesh	
 	unsigned int loadTexture(char const * path);// load texture for boid

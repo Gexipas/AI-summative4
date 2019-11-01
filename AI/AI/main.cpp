@@ -29,6 +29,7 @@ enum InputState
 };
 
 InputState MouseState[3];
+InputState KeyState[255];
 
 GLuint program;
 
@@ -40,6 +41,8 @@ void Init(int argc, char **argv);
 void Update();
 void mousePassiveInput(int x, int y);
 void MouseClick(int button, int state, int x, int y);
+void KeyboardDown(unsigned char key, int x, int y);
+void KeyboardUp(unsigned char key, int x, int y);
 
 GLuint VBO, VAO, EBO, texture;
 
@@ -89,7 +92,8 @@ void Init(int argc, char **argv)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Callbacks
-	
+	glutKeyboardFunc(KeyboardDown);
+	glutKeyboardUpFunc(KeyboardUp);
 	glutPassiveMotionFunc(mousePassiveInput);
 	glutMotionFunc(mousePassiveInput);
 	glutMouseFunc(MouseClick);
@@ -117,8 +121,24 @@ void Update()
 	}
 	if (MouseState[2] == INPUT_DOWN_FIRST)
 	{
-		boid::instance().deleteBoid();
+		boid::instance().deleteBoid(false);
 		//MouseState[2] = INPUT_DOWN;
+	}
+	if (KeyState[48] == INPUT_DOWN_FIRST)
+	{
+		boid::instance().m_iMode = 0;
+		KeyState[48] == INPUT_DOWN;
+	}
+	if (KeyState[49] == INPUT_DOWN_FIRST)
+	{
+		boid::instance().m_iMode = 1;
+		KeyState[49] == INPUT_DOWN;
+	}
+	if (KeyState[50] == INPUT_DOWN_FIRST)
+	{
+		boid::instance().togglePlayerBoid(true);
+		boid::instance().m_iMode = 2;
+		KeyState[50] == INPUT_DOWN;
 	}
 
 	glutPostRedisplay();
@@ -138,4 +158,14 @@ void MouseClick(int button, int state, int x, int y)
 		return;
 
 	MouseState[button] = (state == GLUT_DOWN) ? INPUT_DOWN_FIRST : INPUT_UP_FIRST;
+}
+
+void KeyboardDown(unsigned char key, int x, int y)
+{
+	KeyState[key] = INPUT_DOWN_FIRST;	
+}
+
+void KeyboardUp(unsigned char key, int x, int y)
+{
+	KeyState[key] = INPUT_UP_FIRST;
 }
