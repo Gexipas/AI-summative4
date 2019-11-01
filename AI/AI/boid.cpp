@@ -11,7 +11,6 @@ void boid::update(float _deltatime)
 	{
 	case 0:
 	{
-		togglePlayerBoid(false);
 		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
 		{
 			seek(i, _deltatime, m_mousePosition);
@@ -20,7 +19,6 @@ void boid::update(float _deltatime)
 	}
 	case 1:
 	{
-		togglePlayerBoid(false);
 		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
 		{
 			seek(i, _deltatime, flee(i));
@@ -32,6 +30,47 @@ void boid::update(float _deltatime)
 		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
 		{
 			seek(i, _deltatime, pursuit(i));
+		}
+		break;
+	}
+	case 3:
+	{
+		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
+		{
+			seek(i, _deltatime, evade(i));
+		}
+		break;
+	}
+	case 4:
+	{
+		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
+		{
+			arrive(i, _deltatime, m_mousePosition);
+		}
+		break;
+	}
+	case 5:
+	{
+		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
+		{
+			seek(i, _deltatime, wandering(i));
+		}
+		break;
+	}
+	case 6:
+	{
+		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
+		{
+			
+			seek(i, _deltatime, pathFollowing(i));
+		}
+		break;
+	}
+	case 11:
+	{
+		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
+		{
+			seek(i, _deltatime, flocking(i));
 		}
 		break;
 	}
@@ -210,7 +249,6 @@ void boid::seek(int boid, float _deltatime, vec2 _endPosition)
 {
 	vec2 position = m_positionBoids[boid];
 	vec2 velocity = m_velocityBoids[boid];
-	vec2 accel;
 	vec2 desiredRoute = _endPosition - position;
 
 	// limit desiredRoute
@@ -225,12 +263,9 @@ void boid::seek(int boid, float _deltatime, vec2 _endPosition)
 	{
 		force = normalize(force)*m_maxforce;
 	}
-
-	//a = a+f
-	accel = accel + force;
-
+	
 	//v = u+a
-	vec2 newVelocity = velocity + accel;
+	vec2 newVelocity = velocity + force;
 	if (!(newVelocity.x == 0 && newVelocity.y == 0)) // cap speed
 	{
 		if (glm::length(newVelocity) > m_maxSpeed)
@@ -371,35 +406,39 @@ vec2 boid::pathFollowing(int _boid)
 {
 	vec2 start;
 	vec2 end;
-	if (m_positionBoids[_boid].x > -(float)(SCR_WIDTH / 2) && m_positionBoids[_boid].x <= -200)
-	{
-		start = { -(float)(SCR_WIDTH / 2),0.0f };
-		end = { -200,300.0f };
-	}
-	else if (m_positionBoids[_boid].x > -200 && m_positionBoids[_boid].x <= 200)
-	{
-		start = { -200,300.0f };
-		end = { 200,-50.0f };
-	}
-	else
-	{
-		start = { 200,-50.0f };
-		end = { (float)(SCR_WIDTH / 2),0.0f };
-	}
+
+	start = { -(float)(SCR_WIDTH / 2),0.0f };
+	end = { (float)(SCR_WIDTH / 2),0.0f };
+
 
 	// p = v norm * speed + pos
-	vec2 point = normalize(m_velocityBoids[_boid]) * 200.0f + m_positionBoids[_boid];
-
-
+	vec2 point = normalize(m_velocityBoids[_boid]) * 25.0f + m_positionBoids[_boid];
+	
 	// a = p - start
 	vec2 a = point - start;
 	// b = end - start
 	vec2 b = end - start;
-	// a . (b/|b|)
-	float distance = dot(a, (b/length(b)));
+	// a . (b/|b|)	
 	// r = b norm * distance
-	vec2 result = normalize(b) * distance;
-	return (result);
+	vec2 norm = normalize(b);
+	
+	vec2 result = norm * dot(a, norm);
+	result = result + start;
+
+	vec2 dir = normalize(end - start) * 10.0f;
+	vec2 target = result + dir;
+
+	float radius = length(result - point);
+
+	if (radius > pathRadius)
+	{
+		return (target);
+	}
+	else
+	{		
+		return(point);
+	}
+	
 }
 
 vec2 boid::flocking(int _boid)

@@ -41,6 +41,7 @@ public:
 	float detectRadius = 200.0f;
 	float wanderRadius = 60.0f;
 	float maxBoidNumber = 5000.0f;
+	float pathRadius = 20.0f;
 	bool m_bContain = false;
 	int m_iMode = 0;
 
@@ -69,6 +70,7 @@ private:
 	boid()
 	{
 		setup2DMesh();
+		togglePlayerBoid(false);
 		srand((unsigned int)time(NULL));
 	}
 
