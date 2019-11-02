@@ -112,7 +112,7 @@ void Update()
 	deltaTime = (currentTime - previousTimeStamp) * 0.001f;
 	previousTimeStamp = currentTime;
 
-	if (deltaTime > (1.0f / 30.0f))
+	if (deltaTime > (1.0f / 20.0f))
 	{
 		boid::instance().deleteBoid(false);
 	}
@@ -121,7 +121,7 @@ void Update()
 
 	if (MouseState[0] == INPUT_DOWN_FIRST)
 	{
-		if (deltaTime < (1.0f / 30.0f))
+		if (deltaTime < (1.0f / 20.0f))
 		{
 			boid::instance().newBoid();
 		}	
@@ -132,6 +132,12 @@ void Update()
 	{
 		boid::instance().deleteBoid(false);
 		//MouseState[2] = INPUT_DOWN;
+	}
+	if (KeyState['q'] == INPUT_DOWN_FIRST || KeyState['Q'] == INPUT_DOWN_FIRST)
+	{
+		boid::instance().deleteBoid(true);
+		KeyState['q'] = INPUT_DOWN;
+		KeyState['Q'] = INPUT_DOWN;
 	}
 	if (KeyState['c'] == INPUT_DOWN_FIRST || KeyState['C'] == INPUT_DOWN_FIRST)
 	{
@@ -152,6 +158,13 @@ void Update()
 		boid::instance().m_iMode = 11;
 		KeyState['f'] = INPUT_DOWN;
 		KeyState['F'] = INPUT_DOWN;
+	}
+	if (KeyState['l'] == INPUT_DOWN_FIRST || KeyState['L'] == INPUT_DOWN_FIRST)
+	{
+		boid::instance().togglePlayerBoid(true);
+		boid::instance().m_iMode = 10;
+		KeyState['l'] = INPUT_DOWN;
+		KeyState['L'] = INPUT_DOWN;
 	}
 	if (KeyState[48] == INPUT_DOWN_FIRST)
 	{
@@ -217,10 +230,36 @@ void MouseClick(int button, int state, int x, int y)
 
 void KeyboardDown(unsigned char key, int x, int y)
 {
-	KeyState[key] = INPUT_DOWN_FIRST;	
+	if (key > 96 && key < 123)
+	{
+		KeyState[key] = INPUT_DOWN_FIRST;
+		KeyState[key - 32] = INPUT_DOWN_FIRST;
+	}
+	else if (key > 64 && key < 90)
+	{
+		KeyState[key] = INPUT_DOWN_FIRST;
+		KeyState[key + 32] = INPUT_DOWN_FIRST;
+	}
+	else
+	{
+		KeyState[key] = INPUT_DOWN_FIRST;
+	}
 }
 
 void KeyboardUp(unsigned char key, int x, int y)
 {
-	KeyState[key] = INPUT_UP_FIRST;
+	if (key > 96 && key < 123)
+	{
+		KeyState[key] = INPUT_UP_FIRST;
+		KeyState[key - 32] = INPUT_UP_FIRST;
+	}
+	else if (key > 64 && key < 90)
+	{
+		KeyState[key] = INPUT_UP_FIRST;
+		KeyState[key + 32] = INPUT_UP_FIRST;
+	}
+	else
+	{
+		KeyState[key] = INPUT_UP_FIRST;
+	}
 }

@@ -38,7 +38,7 @@ public:
 	vec2 playerPositionBoid;
 	float m_maxSpeed = 300.0f;
 	float m_maxforce = 10.0f;
-	float detectRadius = 200.0f;
+	float detectRadius = 80.0f;
 	float wanderRadius = 60.0f;
 	float maxBoidNumber = 5000.0f;
 	float pathRadius = 20.0f;
@@ -89,6 +89,7 @@ private:
 
 	// advanced behaviours
 	vec2 flocking(int _boid);// flocking function
+	vec2 leader(int _boid);// leader following function
 	
 	// texture
 	void setup2DMesh();// setup 2d mesh	

@@ -35,9 +35,19 @@ void boid::update(float _deltatime)
 	}
 	case 3:
 	{
+		vec2 vector;
+		vec2 leaderAvoid;
 		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
 		{
-			seek(i, _deltatime, evade(i));
+			leaderAvoid = { 0.0f,0.0f };
+			vector = m_positionBoids[i] - playerPositionBoid;
+			if (glm::length(vector) > 0 && glm::length(vector) < 200.0f)
+			{
+				leaderAvoid = normalize(vector) * m_maxSpeed;
+			}
+			leaderAvoid = leaderAvoid + m_positionBoids[i];
+
+			seek(i, _deltatime, (evade(i)+leaderAvoid)/2.0f);
 		}
 		break;
 	}
@@ -59,10 +69,76 @@ void boid::update(float _deltatime)
 	}
 	case 6:
 	{
+		vec2 seperation;
+		float count;
+		vec2 vector;
 		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
 		{
-			
-			seek(i, _deltatime, pathFollowing(i));
+			seperation = { 0.0f,0.0f };
+			count = 0.0f;
+			//seperation
+			for (unsigned int j = 0; j < m_velocityBoids.size(); j++)
+			{
+				vector = m_positionBoids[i] - m_positionBoids[j];
+				if (glm::length(vector) > 0 && glm::length(vector) < 30.0f)
+				{
+					seperation = seperation + normalize(vector);
+					count++;
+				}
+			}
+			if (count > 0)
+			{
+				seperation = seperation / count;
+			}
+			seperation = seperation * m_maxSpeed;
+			seperation = seperation + m_positionBoids[i];
+
+			seek(i, _deltatime, (pathFollowing(i)+seperation)/2.0f);
+		}
+		break;
+	}
+	case 10:
+	{
+		vec2 seperation;
+		float count;
+		vec2 vector;
+		vec2 leader;
+		vec2 leaderAvoid;
+		for (unsigned int i = 0; i < m_velocityBoids.size(); i++)
+		{
+			// leader following
+			leader = normalize(playerVelocityBoid*-1.0f);
+			leader = leader * 50.0f;
+			leader = leader + playerPositionBoid;
+
+			seperation = { 0.0f,0.0f };
+			count = 0.0f;
+			//seperation
+			for (unsigned int j = 0; j < m_velocityBoids.size(); j++)
+			{
+				vector = m_positionBoids[i] - m_positionBoids[j];
+				if (glm::length(vector) > 0 && glm::length(vector) < 30.0f)
+				{
+					seperation = seperation + normalize(vector);
+					count++;
+				}
+			}
+			if (count > 0)
+			{
+				seperation = seperation / count;
+			}
+			seperation = seperation * m_maxSpeed;
+			seperation = seperation + m_positionBoids[i];
+
+			leaderAvoid = { 0.0f,0.0f };
+			vector = m_positionBoids[i] - playerPositionBoid;
+			if (glm::length(vector) > 0 && glm::length(vector) < 100.0f)
+			{
+				leaderAvoid = normalize(vector) * m_maxSpeed;				
+			}
+			leaderAvoid = leaderAvoid + m_positionBoids[i];
+
+			arrive(i, _deltatime, (leader+seperation+leaderAvoid)/3.0f);
 		}
 		break;
 	}
@@ -443,53 +519,72 @@ vec2 boid::pathFollowing(int _boid)
 
 vec2 boid::flocking(int _boid)
 {
-	// mouse follow
-	vec2 mouse = m_mousePosition - m_positionBoids[_boid];
-
 	// variables
 	vec2 seperation = { 0.0f,0.0f };
 	vec2 allignment = { 0.0f,0.0f };
 	vec2 cohesion = { 0.0f,0.0f };
+	float count = 0.0f;
 
 	// check if more than one
 	if (m_velocityBoids.size() > 1)
-	{
+	{		
 		//seperation
+		count = 0.0f;
+		vec2 vector;
 		for (unsigned int j = 0; j < m_velocityBoids.size(); j++)
 		{
-			if (j != _boid && glm::length(m_positionBoids[_boid] - m_positionBoids[j]) < detectRadius / 4.0f)
+			vector = m_positionBoids[_boid] - m_positionBoids[j];
+			if (glm::length(vector) > 0 && glm::length(vector) < 30.0f)
 			{
-				vec2 vector = m_positionBoids[_boid] - m_positionBoids[j];
-				seperation = seperation + vector;
+				seperation = seperation + normalize(vector);
+				count++;
 			}
 		}
-		seperation = seperation / (float)(m_velocityBoids.size() - 1);
+		if (count > 0)
+		{
+			seperation = seperation / count;
+		}
+		seperation = seperation * m_maxSpeed;
+		seperation = seperation + m_positionBoids[_boid];
 
-		// allignment			
+		// allignment	
+		count = 0.0f;
 		for (unsigned int j = 0; j < m_velocityBoids.size(); j++)
 		{
-			if (j != _boid && glm::length(m_positionBoids[_boid] - m_positionBoids[j]) < detectRadius)
+			vector = m_positionBoids[_boid] - m_positionBoids[j];
+			if (glm::length(vector) > 0 && glm::length(vector) < detectRadius)
 			{
-				allignment = allignment + m_velocityBoids[j];
+				allignment = allignment + normalize(m_velocityBoids[j]);
+				count++;
 			}
 		}
-		allignment = allignment / (float)(m_velocityBoids.size() - 1);
+		if (count > 0)
+		{
+			allignment = allignment / count;
+		}
+		allignment = allignment * m_maxSpeed;
+		allignment = allignment + m_positionBoids[_boid];
 
-		//cohesion			
+		//cohesion		
+		count = 0.0f;
 		for (unsigned int j = 0; j < m_velocityBoids.size(); j++)
 		{
-			if (j != _boid && glm::length(m_positionBoids[_boid] - m_positionBoids[j]) < detectRadius)
+			vector = m_positionBoids[_boid] - m_positionBoids[j];
+			if (glm::length(vector) > 0 && glm::length(vector) < detectRadius)
 			{
 				cohesion = cohesion + m_positionBoids[j];
+				count++;
 			}
 		}
-		cohesion = cohesion / (float)(m_velocityBoids.size() - 1);
-		vec2 cohesionVec = cohesion - m_positionBoids[_boid];
+		if (count > 0)
+		{
+			cohesion = cohesion / count;
+		}
 	}
 
 	// flocking
-	vec2 total = ((seperation * 1000.0f) + (allignment*10.0f) + (cohesion * 2.0f) + mouse) / 4.0f;
-	return(total + m_positionBoids[_boid]);
+	vec2 total = (seperation + allignment + cohesion) / 3.0f;
+	return(total);
 }
 
 void boid::setup2DMesh()

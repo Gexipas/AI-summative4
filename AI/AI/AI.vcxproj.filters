@@ -26,16 +26,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pathFollow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="flocking.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CPF.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Q.h">
