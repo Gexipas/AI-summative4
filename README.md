@@ -19,3 +19,6 @@ Project made for a University assignment.
 - 6 - Path following/group path following
 * F - Flocking
 * L - Leader following
+
+## Project Build
+[Link to the project Build](https://github.com/Gexipas/AI-summative4/raw/master/Build.zip)
